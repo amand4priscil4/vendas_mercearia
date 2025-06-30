@@ -5,7 +5,7 @@ const { db } = require('../models/database');
 // Listar todos os clientes
 router.get('/', (req, res) => {
   const query = 'SELECT * FROM clientes WHERE ativo = 1 ORDER BY nome';
-
+  
   db.all(query, [], (err, rows) => {
     if (err) {
       console.error('Erro ao buscar clientes:', err);
@@ -24,7 +24,7 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
   const id = req.params.id;
   const query = 'SELECT * FROM clientes WHERE id = ? AND ativo = 1';
-
+  
   db.get(query, [id], (err, row) => {
     if (err) {
       console.error('Erro ao buscar cliente:', err);
@@ -42,27 +42,27 @@ router.get('/:id', (req, res) => {
 
 // Cadastrar novo cliente
 router.post('/', (req, res) => {
-  const { nome, cpf, telefone, endereco } = req.body;
-
+  const { nome, telefone } = req.body;
+  
   // Validações
   if (!nome) {
-    return res.status(400).json({
-      error: 'Nome é obrigatório'
+    return res.status(400).json({ 
+      error: 'Nome é obrigatório' 
     });
   }
-
+  
   if (nome.length < 2) {
-    return res.status(400).json({
-      error: 'Nome deve ter pelo menos 2 caracteres'
+    return res.status(400).json({ 
+      error: 'Nome deve ter pelo menos 2 caracteres' 
     });
   }
-
+  
   const query = `
-    INSERT INTO clientes (nome, cpf, telefone, endereco)
-    VALUES (?, ?, ?, ?)
+    INSERT INTO clientes (nome, telefone)
+    VALUES (?, ?)
   `;
-
-  db.run(query, [nome, cpf || null, telefone || null, endereco || null], function (err) {
+  
+  db.run(query, [nome, telefone || null], function(err) {
     if (err) {
       console.error('Erro ao cadastrar cliente:', err);
       res.status(500).json({ error: 'Erro ao cadastrar cliente' });
@@ -73,9 +73,7 @@ router.post('/', (req, res) => {
         cliente: {
           id: this.lastID,
           nome,
-          cpf,
-          telefone,
-          endereco
+          telefone
         }
       });
     }
@@ -85,22 +83,22 @@ router.post('/', (req, res) => {
 // Atualizar cliente
 router.put('/:id', (req, res) => {
   const id = req.params.id;
-  const { nome, cpf, telefone, endereco } = req.body;
-
+  const { nome, telefone } = req.body;
+  
   // Validações
   if (!nome) {
-    return res.status(400).json({
-      error: 'Nome é obrigatório'
+    return res.status(400).json({ 
+      error: 'Nome é obrigatório' 
     });
   }
-
+  
   const query = `
     UPDATE clientes 
-    SET nome = ?, cpf = ?, telefone = ?, endereco = ?
+    SET nome = ?, telefone = ?
     WHERE id = ? AND ativo = 1
   `;
-
-  db.run(query, [nome, cpf || null, telefone || null, endereco || null, id], function (err) {
+  
+  db.run(query, [nome, telefone || null, id], function(err) {
     if (err) {
       console.error('Erro ao atualizar cliente:', err);
       res.status(500).json({ error: 'Erro ao atualizar cliente' });
@@ -119,8 +117,8 @@ router.put('/:id', (req, res) => {
 router.delete('/:id', (req, res) => {
   const id = req.params.id;
   const query = 'UPDATE clientes SET ativo = 0 WHERE id = ? AND ativo = 1';
-
-  db.run(query, [id], function (err) {
+  
+  db.run(query, [id], function(err) {
     if (err) {
       console.error('Erro ao deletar cliente:', err);
       res.status(500).json({ error: 'Erro ao deletar cliente' });
@@ -138,7 +136,7 @@ router.delete('/:id', (req, res) => {
 // Buscar histórico de compras do cliente
 router.get('/:id/historico', (req, res) => {
   const clienteId = req.params.id;
-
+  
   const query = `
     SELECT 
       v.id,
@@ -155,7 +153,7 @@ router.get('/:id/historico', (req, res) => {
     GROUP BY v.id
     ORDER BY v.created_at DESC
   `;
-
+  
   db.all(query, [clienteId], (err, rows) => {
     if (err) {
       console.error('Erro ao buscar histórico:', err);
