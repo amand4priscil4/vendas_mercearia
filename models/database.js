@@ -1,7 +1,7 @@
 const sqlite3 = require('sqlite3').verbose();
 
 // Criar conexão com o banco
-const db = new sqlite3.Database('vendas.db', err => {
+const db = new sqlite3.Database('vendas.db', (err) => {
   if (err) {
     console.error('Erro ao conectar com o banco:', err.message);
   } else {
@@ -28,9 +28,7 @@ function criarTabelas() {
       db.run(`CREATE TABLE IF NOT EXISTS clientes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nome TEXT NOT NULL,
-        cpf TEXT,
         telefone TEXT,
-        endereco TEXT,
         ativo BOOLEAN DEFAULT 1,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )`);
@@ -61,8 +59,7 @@ function criarTabelas() {
       )`);
 
       // Tabela de relatórios diários
-      db.run(
-        `CREATE TABLE IF NOT EXISTS relatorios_diarios (
+      db.run(`CREATE TABLE IF NOT EXISTS relatorios_diarios (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         data DATE NOT NULL UNIQUE,
         total_dinheiro REAL DEFAULT 0,
@@ -72,25 +69,23 @@ function criarTabelas() {
         vendas_normais INTEGER DEFAULT 0,
         vendas_nota INTEGER DEFAULT 0,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      )`,
-        err => {
-          if (err) {
-            console.error('Erro ao criar tabelas:', err);
-            reject(err);
-          } else {
-            console.log('✅ Tabelas criadas/verificadas');
-            resolve();
-          }
+      )`, (err) => {
+        if (err) {
+          console.error('Erro ao criar tabelas:', err);
+          reject(err);
+        } else {
+          console.log('✅ Tabelas criadas/verificadas');
+          resolve();
         }
-      );
+      });
     });
   });
 }
 
 // Função para fechar conexão
 function fecharConexao() {
-  return new Promise(resolve => {
-    db.close(err => {
+  return new Promise((resolve) => {
+    db.close((err) => {
       if (err) {
         console.error('Erro ao fechar banco:', err.message);
       } else {
