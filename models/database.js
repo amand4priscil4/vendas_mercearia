@@ -19,7 +19,6 @@ function criarTabelas() {
         nome TEXT NOT NULL,
         preco_normal REAL NOT NULL,
         preco_nota REAL NOT NULL,
-        estoque INTEGER DEFAULT 0,
         ativo BOOLEAN DEFAULT 1,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )`);
@@ -41,6 +40,7 @@ function criarTabelas() {
         forma_pagamento TEXT NOT NULL,
         valor_total REAL NOT NULL,
         status TEXT DEFAULT 'pendente',
+        data_pagamento DATE,
         observacoes TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (cliente_id) REFERENCES clientes (id)
