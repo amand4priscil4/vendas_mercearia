@@ -5,7 +5,7 @@ const { db } = require('../models/database');
 // Listar todos os produtos
 router.get('/', (req, res) => {
   const query = 'SELECT * FROM produtos WHERE ativo = 1 ORDER BY nome';
-
+  
   db.all(query, [], (err, rows) => {
     if (err) {
       console.error('Erro ao buscar produtos:', err);
@@ -24,7 +24,7 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
   const id = req.params.id;
   const query = 'SELECT * FROM produtos WHERE id = ? AND ativo = 1';
-
+  
   db.get(query, [id], (err, row) => {
     if (err) {
       console.error('Erro ao buscar produto:', err);
@@ -42,27 +42,27 @@ router.get('/:id', (req, res) => {
 
 // Cadastrar novo produto
 router.post('/', (req, res) => {
-  const { nome, preco_normal, preco_nota, estoque = 0 } = req.body;
-
+  const { nome, preco_normal, preco_nota } = req.body;
+  
   // Validações
   if (!nome || !preco_normal || !preco_nota) {
-    return res.status(400).json({
-      error: 'Nome, preço normal e preço nota são obrigatórios'
+    return res.status(400).json({ 
+      error: 'Nome, preço normal e preço nota são obrigatórios' 
     });
   }
-
+  
   if (preco_normal <= 0 || preco_nota <= 0) {
-    return res.status(400).json({
-      error: 'Preços devem ser maiores que zero'
+    return res.status(400).json({ 
+      error: 'Preços devem ser maiores que zero' 
     });
   }
-
+  
   const query = `
-    INSERT INTO produtos (nome, preco_normal, preco_nota, estoque)
-    VALUES (?, ?, ?, ?)
+    INSERT INTO produtos (nome, preco_normal, preco_nota)
+    VALUES (?, ?, ?)
   `;
-
-  db.run(query, [nome, preco_normal, preco_nota, estoque], function (err) {
+  
+  db.run(query, [nome, preco_normal, preco_nota], function(err) {
     if (err) {
       console.error('Erro ao cadastrar produto:', err);
       res.status(500).json({ error: 'Erro ao cadastrar produto' });
@@ -74,8 +74,7 @@ router.post('/', (req, res) => {
           id: this.lastID,
           nome,
           preco_normal,
-          preco_nota,
-          estoque
+          preco_nota
         }
       });
     }
@@ -85,22 +84,22 @@ router.post('/', (req, res) => {
 // Atualizar produto
 router.put('/:id', (req, res) => {
   const id = req.params.id;
-  const { nome, preco_normal, preco_nota, estoque } = req.body;
-
+  const { nome, preco_normal, preco_nota } = req.body;
+  
   // Validações
   if (!nome || !preco_normal || !preco_nota) {
-    return res.status(400).json({
-      error: 'Nome, preço normal e preço nota são obrigatórios'
+    return res.status(400).json({ 
+      error: 'Nome, preço normal e preço nota são obrigatórios' 
     });
   }
-
+  
   const query = `
     UPDATE produtos 
-    SET nome = ?, preco_normal = ?, preco_nota = ?, estoque = ?
+    SET nome = ?, preco_normal = ?, preco_nota = ?
     WHERE id = ? AND ativo = 1
   `;
-
-  db.run(query, [nome, preco_normal, preco_nota, estoque, id], function (err) {
+  
+  db.run(query, [nome, preco_normal, preco_nota, id], function(err) {
     if (err) {
       console.error('Erro ao atualizar produto:', err);
       res.status(500).json({ error: 'Erro ao atualizar produto' });
@@ -119,8 +118,8 @@ router.put('/:id', (req, res) => {
 router.delete('/:id', (req, res) => {
   const id = req.params.id;
   const query = 'UPDATE produtos SET ativo = 0 WHERE id = ? AND ativo = 1';
-
-  db.run(query, [id], function (err) {
+  
+  db.run(query, [id], function(err) {
     if (err) {
       console.error('Erro ao deletar produto:', err);
       res.status(500).json({ error: 'Erro ao deletar produto' });
